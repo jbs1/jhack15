@@ -61,27 +61,25 @@ public class TokenDatabase extends Service {
 		
 	}
 	public boolean deleteShare(String name) {
-		if(removefromJSON(name)){
-			return true;
-		} else {
-			return false;
-		}
+		return removefromJSON(name);
 	}
 
 	public List<String> getShares(){
-		JSONObject obj=loadJSON();
 		ArrayList<String> list = new ArrayList<String>();
 
+		JSONObject obj = loadJSON();
+		
 		try {
-			JSONArray db=obj.getJSONArray("db");
-			JSONObject curobj;
+			JSONArray db = obj.getJSONArray("db");
 
 			for(int i = 0; i < db.length(); i++){
-				curobj=(JSONObject) db.get(i);
-				list.add((String) curobj.get("name"));
+				list.add(db.getJSONObject(i).get("name").toString());
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
+			/*
+			 *  no values in db!
+			 *  return empty list
+			 */
 		}		
 
 		return list;
@@ -166,29 +164,31 @@ public class TokenDatabase extends Service {
 	}
 
 	private boolean removefromJSON(String sname){
-		JSONObject in=loadJSON();
+		JSONObject in = loadJSON();
 		try{
-			JSONArray db=in.getJSONArray("db");
-			for(int i=0; i<db.length();i++){
-				JSONObject obj=db.getJSONObject(i);
-				if(obj.get("name")==sname){
+			JSONArray db = in.getJSONArray("db");
+			
+			for(int i = 0; i < db.length(); i++){
+				JSONObject obj = db.getJSONObject(i);
+				
+				if(obj.get("name").equals(sname)){
 					db.remove(i);
-					in.put("db",db);
+					in.put("db", db);
 					saveJSON(in);
 					return true;
 				}
 			}
-
-		}catch(Exception e){
+		}catch(JSONException e){
 			e.printStackTrace();
 		}
+		
 		return false;
 	}
 
 	private void initFile() {
 		try {
 			FileOutputStream fos = getApplication().getApplicationContext().openFileOutput(FILENAME, Context.MODE_PRIVATE);
-			fos.write("{}".getBytes());
+			fos.write("{\"db\": []}".getBytes());
 			fos.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -249,5 +249,23 @@ public class TokenDatabase extends Service {
 		TokenDatabase getService() {
 			return TokenDatabase.this;
 		}
+	}
+
+
+	public String getToken(String share) throws Exception {
+		try {
+			JSONArray db = loadJSON().getJSONArray("db");
+			
+			for(int i = 0; i < db.length();  i++) {
+				JSONObject curShare = db.getJSONObject(i);
+				
+				if(curShare.getString("name").equals(share))
+					return curShare.getString("key");
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		throw new Exception("No share with the name '" + share + "'!");
 	}
 }
