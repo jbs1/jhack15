@@ -9,9 +9,12 @@ import java.nio.ByteOrder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class ShareActivity extends Activity {
+public class ShareDetailsActivity extends Activity {
 
 	public static final String EXTRA_SHARE = "extraShareName";
 	public static final String EXTRA_TOKEN = "extraToken";
@@ -30,34 +33,55 @@ public class ShareActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_share);
+		setContentView(R.layout.activity_share_details);
 		
-		Intent shareNameIntent = getIntent();
-		shareName = shareNameIntent.getStringExtra(EXTRA_SHARE);
-		token = shareNameIntent.getStringExtra(EXTRA_TOKEN);
+		/*
+		 * Receive intent extras.
+		 */
+		Intent inputIntent = getIntent();
+		shareName = inputIntent.getStringExtra(EXTRA_SHARE);
+		token = inputIntent.getStringExtra(EXTRA_TOKEN);
 		
-		TextView sharenametext = (TextView)findViewById(R.id.sharename);
-		sharenametext.setText(shareName);
+		setupTextViews();
 		
-		
-		TextView link = (TextView)findViewById(R.id.remote_link);
-		link.setText("http://" + getWifiIP() + ":8080");
-		
-		
-		TextView tokentext = (TextView)findViewById(R.id.sharetoken);
-		tokentext.setText("Token: "+token);
-		
-		Button shares_button = (Button)findViewById(R.id.allshares);
-		shares_button.setText("All shares");
+		Button allSharesBtn = (Button)findViewById(R.id.buttonAllShare);
 
-		shares_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-				Intent intent = new Intent(ShareActivity.this, ShareOverviewActivity.class);
+		/*
+		 * Open the ShareOverviewActivity on click.
+		 */
+		allSharesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ShareDetailsActivity.this, ShareOverviewActivity.class);
 				startActivity(intent);
-                
             }
         });
 		
+	}
+	
+	private void setupTextViews() {
+		/*
+		 * Setup TextViews.
+		 */
+		TextView shareText = (TextView)findViewById(R.id.shareText);
+		shareText.setText(shareName);
+		
+		setShareUrl();
+		
+		TextView tokenText = (TextView)findViewById(R.id.tokenText);
+		tokenText.setText(token);
+	}
+	
+	private void setShareUrl() {
+		TextView linkText = (TextView)findViewById(R.id.linkText);
+		String ip;
+		if( (ip = getWifiIP()).equals("") ) {
+			linkText.setText("No Wifi available!");
+			linkText.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.holo_red_dark));
+		} else {
+			linkText.setText("http://" + ip + ":8080");
+			linkText.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.primary_text_dark));
+		}
 	}
 	
 	private String getWifiIP(){
@@ -75,8 +99,8 @@ public class ShareActivity extends Activity {
 		try {
 			ipAddressString = InetAddress.getByAddress(ipByteArray).getHostAddress();
 		} catch (UnknownHostException ex) {
-			Log.e("WIFIIP", "Unable to get host address.");
-			ipAddressString = "can't get ip";
+			Log.e("@string/logtag", "Unable to get host address.");
+			ipAddressString = "";
 		}
 
 		return ipAddressString;
@@ -85,7 +109,7 @@ public class ShareActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.share_details, menu);
 		return true;
 	}
 
@@ -95,7 +119,8 @@ public class ShareActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		if (id == R.id.action_refresh) {
+			setShareUrl();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

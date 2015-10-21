@@ -22,8 +22,6 @@ import android.widget.EditText;
 
 public class CreateShareActivity extends Activity {
 	
-//	public static final String EXTRA_FILES = "filesToShare";
-
 	Button submitBtn;
 	EditText shareNameInput; 
 	
@@ -137,9 +135,9 @@ public class CreateShareActivity extends Activity {
 				 *  Launch ShareActivity
 				 */
 				
-				Intent intent = new Intent(CreateShareActivity.this, ShareActivity.class);
-				intent.putExtra(ShareActivity.EXTRA_SHARE, shareName);
-				intent.putExtra(ShareActivity.EXTRA_TOKEN, token);
+				Intent intent = new Intent(CreateShareActivity.this, ShareDetailsActivity.class);
+				intent.putExtra(ShareDetailsActivity.EXTRA_SHARE, shareName);
+				intent.putExtra(ShareDetailsActivity.EXTRA_TOKEN, token);
 				startActivity(intent);
 			}
 		});

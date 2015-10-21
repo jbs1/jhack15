@@ -2,11 +2,15 @@
 <resources>
 
     <string name="app_name">QuickShare</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_create_share">Create Share</string>
     <string name="enter_share_name">Enter share name:</string>
     <string name="share_name">share name</string>
     <string name="title_activity_share_overview">Your Shares</string>
+    <string name="all_shares">All shares</string>
+    <string name="delete_shares">Delete Share(s)</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="title_activity_share_details">Share Details</string>
+    <string name="logtag">quickshare</string>
 
 </resources>
